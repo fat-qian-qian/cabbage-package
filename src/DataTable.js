@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {
     Table,
     Thead,
@@ -227,36 +226,3 @@ function Filter({
         />
     )
 }
-
-DataTable.propsTypes = {
-    columns: PropTypes.arrayOf(
-        PropTypes.shape({
-            header: PropTypes.string.isRequired,
-            cell: PropTypes.oneOfType([
-                PropTypes.node,
-                PropTypes.func,
-            ]).isRequired,
-            accessor: PropTypes.string.isRequired,
-            filter: PropTypes.oneOfType([
-                PropTypes.node,
-                PropTypes.func,
-            ]),
-        })
-    ).isRequired,
-    data: PropTypes.arrayOf(
-        PropTypes.shape({
-            id: PropTypes.string.isRequired,
-        })
-    ).isRequired,
-    tableStyle: PropTypes.object,
-    thStyle: PropTypes.object,
-    tdStyle: PropTypes.object,
-    renderRowSubComponents: PropTypes.arrayOf(PropTypes.func),
-    customHeaders: PropTypes.arrayOf(PropTypes.node),
-    enablePagination: PropTypes.bool,
-    enableCaption: PropTypes.bool,
-    enableFilter: PropTypes.bool,
-    enableRowDoubleClick: PropTypes.bool,
-    rowDoubleClickHandler: PropTypes.func,
-    caption: PropTypes.string,
-};
