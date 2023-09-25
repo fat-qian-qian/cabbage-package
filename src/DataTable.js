@@ -99,14 +99,14 @@ export const DataTable = ({
                                 {...thStyle}
                                 key={header.id}
                                 cursor={'pointer'}
-                                onClick={header.column.getToggleSortingHandler()}
-                            >
+                                >
 
                                 <Flex
                                     alignItems={'center'}
                                     justifyContent={'center'}
                                     position="relative"
-                                >
+                                    onClick={header.column.getToggleSortingHandler()}
+                                    >
                                     {flexRender(header.column.columnDef.header, header.getContext())}
                                     <IconButton
                                         aria-label="Sort"

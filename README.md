@@ -28,7 +28,7 @@ const App = () => (
 Here's how to use the `DataTable` component in a React component:
 
 ```jsx
-import { DataTable } from './DataTable';
+import { DataTable } from '@fatqianqian/cabbage-package';
 
 const App = () => {
   const columns = [
