@@ -1,6 +1,6 @@
 {
   "name": "@fatqianqian/cabbage-package",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "A collection of advanced and customizable React components built on top of Chakra UI. Starting with a rich data table component offering built-in pagination, theming options, and flexible row customization, this package aims to enhance your Chakra UI experience with a suite of supplementary components for diverse applications.",
   "main": "dist/index.js",
   "scripts": {

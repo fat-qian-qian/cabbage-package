@@ -10,6 +10,7 @@ export const PageNavButtonGroup = ({ table }) => {
         <Flex
             gap={0}
             w={'60%'}
+            placeContent={'center'}
             >
             <Button
                 rounded={'full'}
