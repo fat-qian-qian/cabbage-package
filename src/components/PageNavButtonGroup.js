@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Flex, Icon, NumberInput, NumberInputField } from "@chakra-ui/react"
+import { Button, Flex, Icon, Input, NumberInput, NumberInputField } from "@chakra-ui/react"
 import { MdSkipNext, MdSkipPrevious, MdNavigateNext, MdNavigateBefore } from 'react-icons/md'
 
 
@@ -9,6 +9,7 @@ export const PageNavButtonGroup = ({ table }) => {
     return (
         <Flex
             gap={0}
+            w={'60%'}
             >
             <Button
                 rounded={'full'}
@@ -26,18 +27,28 @@ export const PageNavButtonGroup = ({ table }) => {
                 <Icon as={MdNavigateBefore} />
             </Button>
             <NumberInput
+                w={'5vw'}
                 value={table.getState().pagination.pageIndex + 1}
                 min={1}
                 max={table.getPageCount()}
                 onChange={(value) => table.setPageIndex(Number(value) - 1)}
             >
                 <NumberInputField
+                    w={'100%'}
+                    borderRadius={'none'}
                     textAlign={'center'}
-                    w={'15vh'}
                     padding={0}
                     margin={0}
                 />
             </NumberInput>
+            <Input
+                w={'5vw'}
+                borderRadius={'none'}
+                textAlign={'center'}
+                value={` / ${table.getPageCount()} 頁`}
+                isReadOnly
+                bg={'gray.100'}
+            />
         
             {/* <Select
                 w={'auto'}
