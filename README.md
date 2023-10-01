@@ -34,12 +34,13 @@ const App = () => {
   const columns = [
     { header: 'Code', accessorKey: 'code' },
     { header: 'Name', accessorKey: 'name' },
+    { header: 'Action', accessorKey: 'action', render: (rowData) => (<Button>{rowData.action}</Button>)}
     // ... more columns
   ];
 
   const data = [
-    { id: 1, code: 'A1', name: 'Apple' },
-    { id: 2, code: 'B1', name: 'Banana' },
+    { id: 1, code: 'A1', name: 'Apple', action: 'Button 1' },
+    { id: 2, code: 'B1', name: 'Banana', action: 'Button 2' },
     // ... more data
   ];
 
@@ -57,6 +58,7 @@ const App = () => {
 ### `columns` (required)
 
 An array of column objects specifying the header label and the key for data accessor.
+If you want to render a custom component in the column, you can also provide a `render` function that takes the row data as the argument and returns the component to be rendered.
 
 - Type: `Array`
 - Example:
@@ -65,20 +67,22 @@ An array of column objects specifying the header label and the key for data acce
   const columns = [
     { header: 'Code', accessorKey: 'code' },
     { header: 'Name', accessorKey: 'name' },
+    { header: 'Action', accessorKey: 'action', render: (rowData) => (<Button>{rowData.action}</Button>)}
   ];
   ```
 
 ### `data` (required)
 
-An array of objects to be displayed in the table.
+An array of objects to be displayed in the table. Each object should have the same keys as the accessor keys specified in the `columns` prop.
+
 
 - Type: `Array`
 - Example:
 
   ```jsx
   const data = [
-    { id: 1, code: 'A1', name: 'Apple' },
-    { id: 2, code: 'B1', name: 'Banana' },
+    { id: 1, code: 'A1', name: 'Apple', action: 'Button 1' },
+    { id: 2, code: 'B1', name: 'Banana', action: 'Button 2' },
   ];
   ```
 
@@ -112,18 +116,6 @@ Allows you to provide additional styles for the table.
     ```
 
 - Type: `Object`
-
-### `renderRowSubComponents`
-
-An array of functions that return React elements to be rendered in extra columns. Each function receives the row data as a parameter.
-
-- Type: `Array<Function>`
-
-### `customHeaders`
-
-An array of strings that are used as headers for the extra columns created by `renderRowSubComponents`.
-
-- Type: `Array<String>`
 
 ### `enablePagination`
 

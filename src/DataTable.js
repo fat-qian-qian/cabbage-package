@@ -134,7 +134,7 @@ export const DataTable = ({
                         position="relative"
                     >
                         {flexRender(header.column.columnDef.header, header.getContext())}
-                        {!header.column.columnDef.render && (
+                        {!header.column.columnDef.render && enableFilter && (
                             <IconButton
                                 aria-label="Sort"
                                 icon={{
