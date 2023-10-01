@@ -161,22 +161,45 @@ A boolean flag that enables or disables filter for the table.
 - Type: `Boolean`
 - Default: `false`
 
+### `enableMultiSelect`
+
+A boolean flag that enables or disables multi select for the table.
+
+- Type: `Boolean`
+- Default: `false`
+
+### `onSelectedRowsChange`
+
+A function that will be called when the selected rows change, must be used with enableMultiSelect set to true.
+
+- Type: `Function`
+- Default: `() => {}`
+- Usage: 
+    ```jsx
+    <DataTable
+      ...
+      enableMultiSelect = {true}
+      onSelectedRowsChange = (selectedRows) => {console.log(selectedRows)},
+      ...
+    />
+    ```
+
 ## Example Usage with All Props
 
 ```jsx
 <DataTable
   columns={columns}
   data={data}
-  selectionMode={true}
-  selection={selectedProducts}
-  onSelectionChange={(ids) => setSelectedProducts(ids.map((id) => products[id]))}
-  dataKey="id"
+  hasCaption={true}
+  caption="Sample Caption"
   tableStyle={{ textAlign: 'center' }}
   renderRowSubComponents={[
-    (props) => (<Button>Button 1</Button>),
-    (props) => (<Link>Link</Link>)
+    (rowData) => (<Button>Button 1</Button>),
+    (rowData) => (<Link>Link</Link>)
   ]}
   customHeaders={['Button', 'Link']}
   enablePagination={true}
+  enableRowDoubleClick={true}
+  rowDoubleClickHandler={(row) => { console.log(row) }}
 />
 ```
