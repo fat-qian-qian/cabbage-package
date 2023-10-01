@@ -33,8 +33,7 @@ export const DataTable = ({
     data,
     tableStyle,
     thStyle,
-    tdStyle ,
-    renderRowSubComponents,
+    tdStyle,
     enableMultiSelect,
     onSelectedRowsChange,
     enablePagination,
@@ -135,23 +134,23 @@ export const DataTable = ({
                         position="relative"
                     >
                         {flexRender(header.column.columnDef.header, header.getContext())}
-                        <IconButton
-                            aria-label="Sort"
-                            icon={
-                                {
+                        {!header.column.columnDef.render && (
+                            <IconButton
+                                aria-label="Sort"
+                                icon={{
                                     desc: <ArrowDownIcon />,
                                     asc: <ArrowUpIcon />,
                                     false: <ArrowUpIcon opacity={0.5} />,
-                                }[header.column.getIsSorted()]
-                            }
-                            onClick={header.column.getToggleSortingHandler()}
-                            size="xs"
-                            colorScheme="black"
-                            position="absolute"
-                            right="0"   // or adjust as needed to position the button
-                        />
+                                }[header.column.getIsSorted()]}
+                                onClick={header.column.getToggleSortingHandler()}
+                                size="xs"
+                                colorScheme="black"
+                                position="absolute"
+                                right="0"
+                            />
+                        )}
                     </Flex>
-                    {enableFilter && header.column.getCanFilter() ? (
+                    {enableFilter && header.column.getCanFilter() && !header.column.columnDef.render ? (
                         <div>
                             <Filter column={header.column} table={table} />
                         </div>
@@ -177,7 +176,7 @@ export const DataTable = ({
                         <Tr
                             key={row.id}
                             _hover={{ bg: "gray.100" }}
-                            onDoubleClick={ () => handleRowDoubleClick(row) }
+                            onDoubleClick={() => handleRowDoubleClick(row)}
                         >
                             {enableMultiSelect && (
                                 <Td
@@ -199,17 +198,20 @@ export const DataTable = ({
                                 </Td>
                             )}
 
-                            {row.getVisibleCells().map((cell) => (
+                            {/* {row.getVisibleCells().map((cell) => (
                                 <Td
                                     {...tdStyle}
                                     key={cell.id}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </Td>
-                            ))}
-                            {renderRowSubComponents.map((renderRowSubComponent) => (
-                                <Td
-                                    {...tdStyle}
-                                >{renderRowSubComponent(row)}</Td>
+                            ))} */}
+                            {row.getVisibleCells().map((cell) => (
+                                <Td {...tdStyle} key={cell.id}>
+                                    {cell.column.columnDef.render
+                                        ? cell.column.columnDef.render(data[row.id])
+                                        : flexRender(cell.column.columnDef.cell, cell.getContext())
+                                    }
+                                </Td>
                             ))}
                         </Tr>
                     ))}
