@@ -49,6 +49,7 @@ function App() {
             enableFilter={true}
             enableRowDoubleClick={true}
             enableMultiSelect={true}
+            enableFixedHeader={true}
             onSelectedRowsChange={(selectedRows) => {
               console.log(selectedRows);
             }}

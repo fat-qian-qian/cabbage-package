@@ -176,6 +176,13 @@ A function that will be called when the selected rows change, must be used with 
     />
     ```
 
+### `enableFixedHeader`
+
+A boolean flag that enables or disables fixed header for the table. maxH will be set to 100% if enableFixedHeader is set to true.
+
+- Type: `Boolean`
+- Default: `false`
+
 ## Example Usage with All Props
 
 ```jsx

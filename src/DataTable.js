@@ -40,6 +40,7 @@ export const DataTable = ({
     enableCaption,
     enableFilter,
     enableRowDoubleClick,
+    enableFixedHeader,
     rowDoubleClickHandler,
     caption,
 }) => {
@@ -163,12 +164,19 @@ export const DataTable = ({
     }
 
     return (
-        <TableContainer>
+        <TableContainer
+            maxH={'100%'}
+            overflowY={'auto'}
+        >
             <Table
                 {...tableStyle}
             >
                 {enableCaption && <Caption caption={caption} />}
-                <Thead>
+                <Thead
+                    position={enableFixedHeader ? "sticky" : "static"}
+                    top="0"
+                    zIndex="1"  // ensures the header stays above other rows
+                >
                     {renderTableHeader()}
                 </Thead>
                 <Tbody>
@@ -298,7 +306,6 @@ DataTable.propTypes = {
     tableStyle: PropTypes.object,
     thStyle: PropTypes.object,
     tdStyle: PropTypes.object,
-    renderRowSubComponents: PropTypes.arrayOf(PropTypes.func),
     enableMultiSelect: PropTypes.bool,
     onSelectedRowsChange: PropTypes.func,
     enablePagination: PropTypes.bool,
@@ -307,6 +314,7 @@ DataTable.propTypes = {
     enableRowDoubleClick: PropTypes.bool,
     rowDoubleClickHandler: PropTypes.func,
     caption: PropTypes.string,
+    enableFixedHeader: PropTypes.bool,
 };
 
 DataTable.defaultProps = {
@@ -329,7 +337,6 @@ DataTable.defaultProps = {
         borderColor: "blackAlpha.900",
         textAlign: "center",
     },
-    renderRowSubComponents: [],
     enableMultiSelect: false,
     enablePagination: false,
     enableCaption: false,
@@ -337,4 +344,5 @@ DataTable.defaultProps = {
     enableRowDoubleClick: false,
     rowDoubleClickHandler: (row) => { alert(`Double Clicked Row ${row.id}`) },
     caption: "",
+    enableFixedHeader: false,
 };
