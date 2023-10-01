@@ -39,6 +39,10 @@ function App() {
             enablePagination={true}
             enableFilter={true}
             enableRowDoubleClick={true}
+            enableMultiSelect={true}
+            onSelectedRowsChange={(selectedRows) => {
+                console.log(selectedRows);
+            } }
         />
         </Flex>
         </Center>
