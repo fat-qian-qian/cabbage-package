@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import {
     Table,
     Thead,
@@ -29,33 +31,18 @@ import { PageNavButtonGroup } from './components/PageNavButtonGroup';
 export const DataTable = ({
     columns,
     data,
-    tableStyle = {
-        textAlign: "center",
-        size: "sm",
-        border: "1px",
-        borderColor: "blackAlpha.900",
-    },
-    thStyle = {
-        border: "1px",
-        textAlign: "center",
-        borderColor: "blackAlpha.900",
-        bg: 'teal.400',
-        color: 'white',
-        fontSize: 'md',
-    },
-    tdStyle = {
-        border: "1px",
-        borderColor: "blackAlpha.900",
-        textAlign: "center",
-    },
-    renderRowSubComponents = [],
-    customHeaders = [],
-    enablePagination = false,
-    enableCaption = false,
-    enableFilter = false,
-    enableRowDoubleClick = false,
-    rowDoubleClickHandler = (row) => { alert(`Double Clicked Row ${row.id}`) },
-    caption = "",
+    tableStyle,
+    thStyle,
+    tdStyle,
+    enableMultiSelect,
+    onSelectedRowsChange,
+    enablePagination,
+    enableCaption,
+    enableFilter,
+    enableRowDoubleClick,
+    enableFixedHeader,
+    rowDoubleClickHandler,
+    caption,
 }) => {
     const [sorting, setSorting] = React.useState([]); // { columnId: 'asc' | 'desc' }
     const table = useReactTable({
@@ -74,113 +61,199 @@ export const DataTable = ({
 
     const displayedRows = enablePagination ? table.getPaginationRowModel().rows : table.getCoreRowModel().rows;
 
+    const handleRowDoubleClick = React.useCallback((row) => {
+        if (enableRowDoubleClick) {
+            rowDoubleClickHandler(row);
+        }
+    }, [enableRowDoubleClick, rowDoubleClickHandler]);
+
+    const [selectedRows, setSelectedRows] = React.useState([]); // Will hold the IDs of selected rows.
+    const [selectAll, setSelectAll] = React.useState(false);   // For 'select all' functionality.
+
+    const toggleRowSelect = React.useCallback(rowId => {
+        setSelectedRows(prevRows => {
+            let newSelectedRows;
+            if (prevRows.includes(rowId)) {
+                newSelectedRows = prevRows.filter(id => id !== rowId);
+            } else {
+                newSelectedRows = [...prevRows, rowId];
+            }
+            // Notify parent about the change
+            onSelectedRowsChange && onSelectedRowsChange(newSelectedRows);
+            return newSelectedRows;
+        });
+    }, [onSelectedRowsChange]);
+
+    const toggleSelectAll = React.useCallback(() => {
+        if (selectAll) {
+            setSelectedRows([]);
+            onSelectedRowsChange && onSelectedRowsChange([]);
+        } else {
+            const allRowIds = displayedRows.map(row => row.id);
+            setSelectedRows(allRowIds);
+            onSelectedRowsChange && onSelectedRowsChange(allRowIds);
+        }
+        setSelectAll(prev => !prev);
+    }, [selectAll, displayedRows, onSelectedRowsChange]);
+
+    const renderTableHeader = () => {
+        return table.getHeaderGroups().map((headerGroup) => (
+            <Tr
+                key={headerGroup.id}
+            >
+                {enableMultiSelect && (
+                    <Th
+                        {...thStyle}
+                        cursor={'pointer'}
+                        onClick={toggleSelectAll}
+                    >
+                        <Flex
+                            alignItems={'center'}
+                            justifyContent={'center'}
+                            position="relative"
+                        >
+                            <input
+                                type="checkbox"
+                                checked={selectAll}
+                                readOnly
+                            />
+                        </Flex>
+                    </Th>
+                )}
+
+
+                {headerGroup.headers.map((header) =>
+                (<Th
+                    {...thStyle}
+                    key={header.id}
+                    cursor={'pointer'}
+                >
+
+                    <Flex
+                        alignItems={'center'}
+                        justifyContent={'center'}
+                        position="relative"
+                    >
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {!header.column.columnDef.render && enableFilter && (
+                            <IconButton
+                                aria-label="Sort"
+                                icon={{
+                                    desc: <ArrowDownIcon />,
+                                    asc: <ArrowUpIcon />,
+                                    false: <ArrowUpIcon opacity={0.5} />,
+                                }[header.column.getIsSorted()]}
+                                onClick={header.column.getToggleSortingHandler()}
+                                size="xs"
+                                colorScheme="black"
+                                position="absolute"
+                                right="0"
+                            />
+                        )}
+                    </Flex>
+                    {enableFilter && header.column.getCanFilter() && !header.column.columnDef.render ? (
+                        <div>
+                            <Filter column={header.column} table={table} />
+                        </div>
+                    ) : null}
+
+                </Th>)
+                )}
+            </Tr>
+        ))
+    }
+
     return (
-        <TableContainer>
+        <TableContainer
+            maxH={'100%'}
+            overflowY={'auto'}
+        >
             <Table
                 {...tableStyle}
             >
-                {enableCaption && (
-                    <TableCaption
-                        placement="top"
-                        bg={"blackAlpha.900"}
-                        color={"white"}
-                        fontSize={"md"}
-                        p={3}
-                        mt={0}
-                    >
-                        {caption}
-                    </TableCaption>
-                )}
-                <Thead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <Tr>
-                            {headerGroup.headers.map((header) =>
-                            (<Th
-                                {...thStyle}
-                                key={header.id}
-                                cursor={'pointer'}
-                                >
-
-                                <Flex
-                                    alignItems={'center'}
-                                    justifyContent={'center'}
-                                    position="relative"
-                                    onClick={header.column.getToggleSortingHandler()}
-                                    >
-                                    {flexRender(header.column.columnDef.header, header.getContext())}
-                                    <IconButton
-                                        aria-label="Sort"
-                                        icon={
-                                            {
-                                                desc: <ArrowDownIcon />,
-                                                asc: <ArrowUpIcon />,
-                                                false: <ArrowUpIcon opacity={0.5} />,
-                                            }[header.column.getIsSorted()]
-                                        }
-                                        size="xs"
-                                        colorScheme="black"
-                                        position="absolute"
-                                        right="0"   // or adjust as needed to position the button
-                                    />
-                                </Flex>
-                                {enableFilter && header.column.getCanFilter() ? (
-                                    <div>
-                                        <Filter column={header.column} table={table} />
-                                    </div>
-                                ) : null}
-
-                            </Th>)
-                            )}
-
-
-
-                            {customHeaders.map((header, index) => (
-                                <Th {...thStyle} key={`custom-header-${index}`}>{header}</Th>
-                            ))}
-                        </Tr>
-                    ))}
+                {enableCaption && <Caption caption={caption} />}
+                <Thead
+                    position={enableFixedHeader ? "sticky" : "static"}
+                    top="0"
+                    zIndex="1"  // ensures the header stays above other rows
+                >
+                    {renderTableHeader()}
                 </Thead>
                 <Tbody>
                     {displayedRows.map((row) => (
                         <Tr
                             key={row.id}
                             _hover={{ bg: "gray.100" }}
-                            onDoubleClick={() => {
-                                if (enableRowDoubleClick) {
-                                    rowDoubleClickHandler(row);
-                                }
-                            }}
+                            onDoubleClick={() => handleRowDoubleClick(row)}
                         >
-                            {row.getVisibleCells().map((cell) => (
+                            {enableMultiSelect && (
+                                <Td
+                                    {...tdStyle}
+                                    cursor={'pointer'}
+                                    onClick={() => toggleRowSelect(row.id)}
+                                >
+                                    <Flex
+                                        alignItems={'center'}
+                                        justifyContent={'center'}
+                                        position="relative"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedRows.includes(row.id)}
+                                            readOnly
+                                        />
+                                    </Flex>
+                                </Td>
+                            )}
+
+                            {/* {row.getVisibleCells().map((cell) => (
                                 <Td
                                     {...tdStyle}
                                     key={cell.id}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </Td>
-                            ))}
-                            {renderRowSubComponents.map((renderRowSubComponent) => (
-                                <Td
-                                    {...tdStyle}
-                                >{renderRowSubComponent(row)}</Td>
+                            ))} */}
+                            {row.getVisibleCells().map((cell) => (
+                                <Td {...tdStyle} key={cell.id}>
+                                    {cell.column.columnDef.render
+                                        ? cell.column.columnDef.render(data[row.id])
+                                        : flexRender(cell.column.columnDef.cell, cell.getContext())
+                                    }
+                                </Td>
                             ))}
                         </Tr>
                     ))}
                 </Tbody>
             </Table>
-            {enablePagination && (
-                <Flex
-                    mt={4}
-                    textAlign={'center'}
-                    alignItems={'center'}
-                    justifyContent={'space-evenly'}
-                >
-                    <PageShowSelector table={table} />
-                    <PageNavButtonGroup table={table} />
-                </Flex>
-            )}
+            {enablePagination && <Pagination table={table} />}
         </TableContainer>
     );
 };
+
+const Caption = ({ caption }) => (
+    <TableCaption
+        placement="top"
+        bg={"blackAlpha.900"}
+        color={"white"}
+        fontSize={"md"}
+        p={3}
+        mt={0}
+    >
+        {caption}
+    </TableCaption>
+)
+
+const Pagination = ({ table }) => (
+    <Flex
+        mt={4}
+        textAlign={'center'}
+        alignItems={'center'}
+        justifyContent={'space-evenly'}
+    >
+        <PageShowSelector table={table} />
+        <PageNavButtonGroup table={table} />
+    </Flex>
+)
 
 function Filter({
     column,
@@ -226,3 +299,50 @@ function Filter({
         />
     )
 }
+
+DataTable.propTypes = {
+    columns: PropTypes.arrayOf(PropTypes.object).isRequired,
+    data: PropTypes.arrayOf(PropTypes.object).isRequired,
+    tableStyle: PropTypes.object,
+    thStyle: PropTypes.object,
+    tdStyle: PropTypes.object,
+    enableMultiSelect: PropTypes.bool,
+    onSelectedRowsChange: PropTypes.func,
+    enablePagination: PropTypes.bool,
+    enableCaption: PropTypes.bool,
+    enableFilter: PropTypes.bool,
+    enableRowDoubleClick: PropTypes.bool,
+    rowDoubleClickHandler: PropTypes.func,
+    caption: PropTypes.string,
+    enableFixedHeader: PropTypes.bool,
+};
+
+DataTable.defaultProps = {
+    tableStyle: {
+        textAlign: "center",
+        size: "sm",
+        border: "1px",
+        borderColor: "blackAlpha.900",
+    },
+    thStyle: {
+        border: "1px",
+        textAlign: "center",
+        borderColor: "blackAlpha.900",
+        bg: 'teal.400',
+        color: 'white',
+        fontSize: 'md',
+    },
+    tdStyle: {
+        border: "1px",
+        borderColor: "blackAlpha.900",
+        textAlign: "center",
+    },
+    enableMultiSelect: false,
+    enablePagination: false,
+    enableCaption: false,
+    enableFilter: false,
+    enableRowDoubleClick: false,
+    rowDoubleClickHandler: (row) => { alert(`Double Clicked Row ${row.id}`) },
+    caption: "",
+    enableFixedHeader: false,
+};
